@@ -2,111 +2,65 @@ import React, { useState } from "react";
 import {
   StyleSheet,
   View,
-  FlatList,
   Text,
-  TouchableOpacity,
-  ScrollView,
-  Button,
-  TextInput,
+  FlatList,
+  Alert,
+  TouchableWithoutFeedback,
+  Keyboard,
 } from "react-native";
-
-const list = [
-  {
-    userId: 1,
-    id: "1",
-    title: "delectus ",
-    completed: false,
-  },
-  {
-    userId: 1,
-    id: "2",
-    title: "quis ",
-    completed: false,
-  },
-  {
-    userId: 1,
-    id: "3",
-    title: "fugiat ",
-    completed: false,
-  },
-  {
-    userId: 1,
-    id: "4",
-    title: "et ",
-    completed: true,
-  },
-  {
-    userId: 1,
-    id: "5",
-    title: "laboriosam ",
-    completed: false,
-  },
-  {
-    userId: 1,
-    id: "6",
-    title: "qui ",
-    completed: false,
-  },
-  {
-    userId: 1,
-    id: "7",
-    title: "illo ",
-    completed: false,
-  },
-];
+import Header from "./components/Header";
+import TodoItem from "./components/TodoItem";
+import AddTodo from "./components/AddTodo";
 
 export default function App() {
-  // const [name, setName] = useState("RJ");
-  // const [age, setAge] = useState(30);
-  // const clickHandler = () => {
-  //   setName("Rahul Jindal");
-  // };
-  const [listItems, setListItems] = useState(list);
-  const pressHandler = (id) => {
-    console.log(id);
-    setListItems((prevListItems) => {
-      return prevListItems.filter((item) => item.id !== id);
+  const initialTodos = [
+    { key: "1", text: "Learn Flutter" },
+    { key: "2", text: "Learn Python" },
+    { key: "3", text: "Learn Java" },
+  ];
+  const [todos, setTodos] = useState(initialTodos);
+  const pressHandler = (key) => {
+    setTodos((prevTodos) => {
+      return prevTodos.filter((todo) => todo.key !== key);
     });
   };
+  const submitHandler = (text) => {
+    if (text.length > 3) {
+      setTodos((prevTodos) => {
+        return [{ text, id: (Math.random() * 1000).toString() }, ...prevTodos];
+      });
+    } else {
+      Alert.alert("OOPS", "Todos must be over 3 chars long", [
+        {
+          text: "UNDERSTOOD",
+          onPress: () => console.log("Alert Closed"),
+        },
+      ]);
+    }
+  };
   return (
-    <View style={styles.container}>
-      <FlatList
-        numColumns={2}
-        keyExtractor={(item) => item.id}
-        data={listItems}
-        renderItem={({ item }) => (
-          <TouchableOpacity onPress={() => pressHandler(item.id)}>
-            <Text style={styles.item}>{item.title}</Text>
-          </TouchableOpacity>
-        )}
-      />
-      {/* <ScrollView>
-        {listItems.map((item) => {
-          return (
-            <View key={item.id}>
-              <Text style={styles.item}>{item.title}</Text>
-            </View>
-          );
-        })}
-      </ScrollView> */}
-      {/* <Text>Enter Name:</Text>
-      <TextInput
-        multiline
-        style={styles.input}
-        placeholder="e.g. JOHN DOE"
-        onChangeText={(val) => setName(val)}
-      />
-      <Text>Enter Age:</Text>
-      <TextInput
-        keyboardType="numeric"
-        style={styles.input}
-        placeholder="e.g. 44"
-        onChangeText={(val) => setAge(val)}
-      />
-      <Text>
-        name : {name}, age : {age}
-      </Text> */}
-    </View>
+    <TouchableWithoutFeedback
+      onPress={() => {
+        Keyboard.dismiss();
+      }}
+    >
+      <View style={styles.container}>
+        {/* header */}
+        <Header />
+        <View style={styles.content}>
+          {/* todo form */}
+          <AddTodo submitHandler={submitHandler} />
+          <View style={styles.list}>
+            <FlatList
+              data={todos}
+              renderItem={({ item }) => (
+                <TodoItem item={item} pressHandler={pressHandler} />
+              )}
+            />
+          </View>
+        </View>
+      </View>
+    </TouchableWithoutFeedback>
   );
 }
 
@@ -114,38 +68,13 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: "#fff",
-    paddingTop: 80,
-    paddingHorizontal: 20,
-    // alignItems: "center",
-    // justifyContent: "center",
   },
-  item: {
-    marginTop: 24,
-    padding: 30,
-    backgroundColor: "pink",
-    fontSize: 24,
-    marginTop: 24,
-    marginHorizontal: 10,
+  content: {
+    padding: 40,
+    flex: 1,
   },
-  header: {
-    backgroundColor: "pink",
-    padding: 20,
-  },
-  boldText: {
-    fontWeight: "bold",
-  },
-  body: {
-    backgroundColor: "yellow",
-    padding: 20,
-  },
-  buttonContainer: {
+  list: {
     marginTop: 20,
-  },
-  input: {
-    borderWidth: 1,
-    borderColor: "#777",
-    padding: 8,
-    margin: 10,
-    width: 200,
+    flex: 1,
   },
 });
